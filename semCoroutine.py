@@ -1,8 +1,9 @@
 import hashlib
+# objetivo = "$%COCACOLA"
 objetivo = "$%COCACOLA"
 wordlist = 'rockyou.txt'
 hashObjetivo = hashlib.md5(objetivo.encode('utf-8')).hexdigest()
-arquivo = open(wordlist,'r')
+arquivo = open(wordlist,'r', errors="ignore")
 senha = arquivo.readline()
 while senha:
     # print('Testando a senha: ' + senha)

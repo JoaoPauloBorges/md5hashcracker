@@ -2,7 +2,7 @@ import hashlib
 import asyncio
 
 def descobrirHash(arquivo, senhaTeste):
-    arq = open(arquivo, 'r')
+    arq = open(arquivo, 'r', errors="ignore")
     th = testarHash(senhaTeste)
     next(th)
     for senha in arq:
@@ -21,7 +21,7 @@ def testarHash(senhaTeste):
         exit(0)
 
 
-senha = "!!!!!!!!!!!!!!!!"
+senha = "$%COCACOLA"
 arq = 'rockyou.txt'
 teste = hashlib.md5(senha.encode('utf-8')).hexdigest()
 descobrirHash(arq, teste)
