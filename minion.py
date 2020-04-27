@@ -1,6 +1,6 @@
 import multiprocessing as mp
 import hashlib
-
+import time
 
 running_flag = mp.Value("i", 1)
 
@@ -17,9 +17,10 @@ def testarHash(running_flag, wanted, outq):
             line = (yield)
             hashTest = hashlib.md5(line.encode('utf-8')).hexdigest()
             if hashTest == wanted:
-                # print("I found it!!! " + mp.current_process()._name)
+                print("I found it!!! " + mp.current_process()._name)
                 outq.put("password found: " + line)
                 running_flag.value = 0
+                time.sleep(0.5)
     except GeneratorExit:
         return
 
@@ -34,35 +35,41 @@ def worker(running_flag, inq, outq):
             fn(running_flag, outq, arg[0], arg[1])
 
 
-if __name__ == '__main__':
+def minion(h, filename, raw):
+    mp.freeze_support()
+
+    running_flag.value = 1
 
     nCores = 3
     process = []
-    filename = "rockyou.txt"
-    wantedHash = hashlib.md5("$%COCACOLA".encode('utf-8')).hexdigest()
+    wantedHash = hashlib.md5(h.encode('utf-8')).hexdigest()
     nLines = 0
-    maxLines = 100000
+    maxLines = 50000
     temp = ""
 
     tasks = mp.Queue()
     results = mp.Queue()
 
-    for i in range(nCores):    
+    for _ in range(nCores):    
         prc = mp.Process(target=worker, args=(running_flag, tasks, results))
         process.append(prc)
         prc.start()
 
-    with open(filename, 'r', errors="ignore") as f:
-        for line in f:
-            if running_flag.value == 0:
-                break
-            if nLines < maxLines:
-                temp += line
-                nLines += 1
-            else:
-                nLines = 0
-                tasks.put((descobrirHash, (temp, wantedHash)))
-                temp = ""
+    if (raw): 
+        f = filename.splitlines()
+    else:
+        f = open(filename, 'r', errors="ignore")
+
+    for line in f:
+        if running_flag.value == 0:
+            break
+        if nLines < maxLines:
+            temp += line+'\n'
+            nLines += 1
+        else:
+            nLines = 0
+            tasks.put((descobrirHash, (temp, wantedHash)))
+            temp = ""
 
     if running_flag.value != 0:
         tasks.put((descobrirHash, (temp, wantedHash)))
@@ -70,7 +77,7 @@ if __name__ == '__main__':
         for prc in process:
             tasks.put('STOP')
     else:
-        print('...killing remaining process')
+        # print('...killing remaining process')
         for prc in process:  
             prc.terminate()
 
@@ -78,6 +85,26 @@ if __name__ == '__main__':
         prc.join()
 
     if not results.empty():
-        print(results.get())
+        out = results.get()
     else:
-        print("password not found")
+        out = "password not found"
+    print(out)
+    
+    if not tasks._closed:
+        tasks.close()
+    if not results._closed:
+        results.close()
+    return out
+
+
+if __name__ == '__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-file', type=str, default='rockyou.txt')
+    parser.add_argument('-hash', type=str, default='iloveyou')
+    args = parser.parse_args()
+
+    filename = args.file
+    h = args.hash
+    minion(h, filename, False)

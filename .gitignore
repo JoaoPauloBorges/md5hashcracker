@@ -1,2 +1,5 @@
 .vscode/
 rockyou.txt
+node_modules/
+__pycache__
+temp*
