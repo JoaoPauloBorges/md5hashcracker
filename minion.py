@@ -42,7 +42,7 @@ def minion(h, filename, raw):
 
     nCores = 3
     process = []
-    wantedHash = hashlib.md5(h.encode('utf-8')).hexdigest()
+    wantedHash = h
     nLines = 0
     maxLines = 50000
     temp = ""

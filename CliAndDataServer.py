@@ -94,7 +94,7 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
             minion_rpc = MinionRPC()
             parsed = urlparse.urlparse(self.path)
             arg = parse_qs(parsed.query)['hash'][0]
-            print(arg)
+            print(f"Searching for hash: {arg}")
             msg = {'hash': arg, 'url': "http://127.0.0.1:3000/list/" }
             response = minion_rpc.call(msg)
             print(" [.] Got %r" % response)
