@@ -1,6 +1,7 @@
-Hash break application via brute force
-using multi-processes and distributed processing
-with rabbitMQ, developed for the subject of Distributed Systems at PUC-GO.
+Hash break application via brute force using multiprocessing and distributed processing
+with rabbitMQ, developed for the subject of Distributed Systems at Pontifical Catholic University of Goiás.
+
+The application receives a wordlist and divides that into smaller lists that will be sent through the web to the 'minions' along with the sought hash. Each minion performs the processing locally and sends the response back to the server case the password was found or not
 
 To search for a hash via the command line, you need to run the following:
 - minionRPC.py
